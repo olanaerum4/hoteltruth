@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HotelTruth — Design Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --sans: "Plus Jakarta Sans", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+
+    --bg:        oklch(0.985 0.006 160);
+    --paper:     oklch(0.975 0.009 150);
+    --surface:   #ffffff;
+    --ink:       oklch(0.27 0.022 240);
+    --ink-soft:  oklch(0.46 0.02 240);
+    --muted:     oklch(0.62 0.016 240);
+    --line:      oklch(0.92 0.008 200);
+    --line-strong: oklch(0.85 0.01 200);
+    --line-wash: oklch(0.95 0.006 200);
+
+    --truth:      oklch(0.60 0.105 185);
+    --truth-soft: oklch(0.78 0.08 185);
+    --truth-deep: oklch(0.46 0.09 188);
+    --good:       oklch(0.62 0.11 162);
+    --alert:      oklch(0.605 0.16 28);
+    --alert-wash: oklch(0.95 0.035 28);
+    --amber:      oklch(0.78 0.135 72);
+    --amber-wash: oklch(0.95 0.05 80);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .ht-root { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  .ht-root h1, .ht-root h2, .ht-root p { margin: 0; }
+
+  .ht-eyebrow {
+    display: inline-block; font-size: 12.5px; font-weight: 700; letter-spacing: 1.3px;
+    text-transform: uppercase; color: var(--truth-deep);
+  }
+  .ht-h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; color: var(--ink); }
+
+  .ht-verified {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 13px; font-weight: 700; color: var(--truth-deep);
+    background: color-mix(in oklch, var(--truth) 14%, transparent);
+    padding: 4px 11px 4px 8px; border-radius: 99px; letter-spacing: -0.1px;
+  }
+
+  .ht-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    font-family: var(--sans); font-weight: 700; border-radius: 99px;
+    cursor: pointer; border: 1.5px solid transparent; white-space: nowrap;
+    padding: 10px 18px; transition: transform .12s, background .15s, box-shadow .15s; line-height: 1;
+  }
+  .ht-btn-primary { background: var(--ink); color: #fff; }
+  .ht-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -6px rgba(20,30,45,.5); }
+  .ht-btn-ghost { background: transparent; border-color: var(--line-strong); color: var(--ink); }
+  .ht-btn-ghost:hover { background: var(--surface); }
+
+  .ht-chip {
+    display: inline-flex; align-items: center; font-family: var(--sans);
+    font-size: 13px; font-weight: 600; color: var(--ink-soft);
+    background: var(--surface); border: 1px solid var(--line);
+    padding: 6px 13px; border-radius: 99px; transition: border-color .12s, color .12s;
+  }
+  .ht-chip:hover { border-color: var(--line-strong); color: var(--ink); }
+  .ht-chip-on { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  .ht-complaint { transition: border-color .15s, box-shadow .15s; }
+  .ht-complaint:hover { border-color: var(--line-strong); box-shadow: 0 4px 14px -8px rgba(20,30,45,.2); }
+  .ht-search input::placeholder { color: var(--muted); opacity: 1; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="ht-parts.jsx"></script>
+<script type="text/babel" src="ht-score.jsx"></script>
+<script type="text/babel" src="ht-result.jsx"></script>
+<script type="text/babel" src="ht-landing.jsx"></script>
+
+<script type="text/babel">
+  const { useState } = React;
+
+  function App() {
+    return (
+      <DesignCanvas>
+        <DCSection id="landing" title="Landing page" subtitle="Three directions — sell the idea, then reveal a sample report">
+          <DCArtboard id="clean" label="A · Clean trust (live search)" width={1280} height={1644}>
+            <HTLandingClean />
+          </DCArtboard>
+          <DCArtboard id="bold" label="B · Bold exposé" width={1280} height={1360}>
+            <HTLandingBold />
+          </DCArtboard>
+          <DCArtboard id="report" label="C · Receipt / editorial" width={1280} height={1244}>
+            <HTLandingReport />
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="result" title="Result screen" subtitle="Hotel Sunrise Bangkok — the honest report a search lands on">
+          <DCArtboard id="dash" label="Dashboard" width={1280} height={1180}>
+            <HTResultDashboard />
+          </DCArtboard>
+          <DCArtboard id="rep" label="Investigative report" width={1280} height={1270}>
+            <HTResultReport />
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="score" title="Honest Score — component studies" subtitle="The hero moment: how the 4.1 and its complaints get shown">
+          <DCArtboard id="sa" label="A · Gauge + complaints" width={600} height={640}>
+            <HTScoreStudyA />
+          </DCArtboard>
+          <DCArtboard id="sb" label="B · Advertised vs honest" width={600} height={560}>
+            <HTScoreStudyB />
+          </DCArtboard>
+          <DCArtboard id="sc" label="C · Honesty receipt" width={560} height={640}>
+            <HTScoreStudyC />
+          </DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

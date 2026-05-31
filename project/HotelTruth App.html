@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HotelTruth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --sans: "Plus Jakarta Sans", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+
+    --bg:        oklch(0.985 0.006 160);
+    --paper:     oklch(0.975 0.009 150);
+    --surface:   #ffffff;
+    --ink:       oklch(0.27 0.022 240);
+    --ink-soft:  oklch(0.46 0.02 240);
+    --muted:     oklch(0.62 0.016 240);
+    --line:      oklch(0.92 0.008 200);
+    --line-strong: oklch(0.85 0.01 200);
+    --line-wash: oklch(0.95 0.006 200);
+
+    /* accent — overridable inline; deep/soft auto-follow */
+    --truth:      oklch(0.60 0.105 185);
+    --truth-deep: color-mix(in oklch, var(--truth), black 20%);
+    --truth-soft: color-mix(in oklch, var(--truth), white 34%);
+
+    --good:       oklch(0.62 0.11 162);
+    --alert:      oklch(0.605 0.16 28);
+    --alert-wash: oklch(0.95 0.035 28);
+    --amber:      oklch(0.78 0.135 72);
+    --amber-wash: oklch(0.95 0.05 80);
+
+    /* inverted panels (verdict / footer / dark hero) — stay dark in both themes */
+    --invert-bg: oklch(0.27 0.022 240);
+    --invert-fg: #ffffff;
+  }
+  .ht-dark {
+    --bg:        oklch(0.205 0.018 245);
+    --paper:     oklch(0.225 0.02 245);
+    --surface:   oklch(0.255 0.02 245);
+    --ink:       oklch(0.955 0.008 240);
+    --ink-soft:  oklch(0.80 0.014 240);
+    --muted:     oklch(0.64 0.016 240);
+    --line:      oklch(0.36 0.018 245);
+    --line-strong: oklch(0.46 0.02 245);
+    --line-wash: oklch(0.30 0.018 245);
+    --truth-deep: color-mix(in oklch, var(--truth), white 14%);
+    --alert-wash: oklch(0.33 0.06 28);
+    --amber-wash: oklch(0.35 0.07 80);
+    --invert-bg: oklch(0.31 0.025 245);
+    --invert-fg: oklch(0.97 0.008 240);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); }
+  .ht-app { font-family: var(--sans); color: var(--ink); min-height: 100vh; background: var(--bg);
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; transition: background .25s; }
+  .ht-app h1, .ht-app h2, .ht-app p { margin: 0; }
+
+  .ht-eyebrow { display: inline-block; font-size: 12.5px; font-weight: 700; letter-spacing: 1.3px;
+    text-transform: uppercase; color: var(--truth-deep); }
+  .ht-h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; color: var(--ink); }
+  .ht-navlink:hover { color: var(--ink); }
+
+  .ht-verified { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700;
+    color: var(--truth-deep); background: color-mix(in oklch, var(--truth) 16%, transparent);
+    padding: 4px 11px 4px 8px; border-radius: 99px; letter-spacing: -0.1px; }
+
+  .ht-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    font-family: var(--sans); font-weight: 700; border-radius: 99px; cursor: pointer;
+    border: 1.5px solid transparent; white-space: nowrap; padding: 10px 18px;
+    transition: transform .12s, background .15s, box-shadow .15s; line-height: 1; }
+  .ht-btn-primary { background: var(--truth); color: #fff; }
+  .ht-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -7px color-mix(in oklch, var(--truth), black 10%); }
+  .ht-btn-ghost { background: transparent; border-color: var(--line-strong); color: var(--ink); }
+  .ht-btn-ghost:hover { background: var(--surface); }
+
+  .ht-chip { display: inline-flex; align-items: center; font-family: var(--sans); font-size: 13px;
+    font-weight: 600; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line);
+    padding: 6px 13px; border-radius: 99px; transition: border-color .12s, color .12s; cursor: pointer; }
+  .ht-chip:hover { border-color: var(--line-strong); color: var(--ink); }
+  .ht-chip-on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  .ht-complaint { transition: border-color .15s, box-shadow .15s; cursor: pointer; }
+  .ht-complaint:hover { border-color: var(--line-strong); box-shadow: 0 4px 14px -8px rgba(20,30,45,.2); }
+  .ht-search input::placeholder { color: var(--muted); opacity: 1; }
+  .ht-search { transition: border-color .15s, box-shadow .15s; }
+  .ht-search:focus-within { border-color: var(--truth) !important; box-shadow: 0 0 0 3px color-mix(in oklch, var(--truth) 18%, transparent) !important; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="ht-parts.jsx"></script>
+<script type="text/babel" src="ht-result.jsx"></script>
+<script type="text/babel" src="ht-landing.jsx"></script>
+<script type="text/babel" src="ht-flow.jsx"></script>
+
+<script type="text/babel">
+  const { useState, useEffect } = React;
+
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "accent": "oklch(0.60 0.105 185)",
+    "tone": "calm",
+    "heroStyle": "compare",
+    "dark": false
+  }/*EDITMODE-END*/;
+
+  function App() {
+    const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+    const [view, setView] = useState(() => localStorage.getItem("ht-view") || "landing");
+    const [query, setQuery] = useState(() => localStorage.getItem("ht-query") || HT_HOTEL);
+
+    useEffect(() => { localStorage.setItem("ht-view", view); }, [view]);
+    useEffect(() => { localStorage.setItem("ht-query", query); }, [query]);
+
+    const goResult = (q) => {
+      if (typeof q === "string" && q.trim()) setQuery(q);
+      setView("result");
+      window.scrollTo({ top: 0 });
+    };
+    const goHome = () => { setView("landing"); window.scrollTo({ top: 0 }); };
+
+    return (
+      <div className={"ht-app" + (t.dark ? " ht-dark" : "")} style={{ "--truth": t.accent }}>
+        {view === "landing"
+          ? <HTFlowLanding tone={t.tone} query={query} setQuery={setQuery} onSearch={goResult} onHome={goHome} />
+          : <HTFlowResult tone={t.tone} heroStyle={t.heroStyle} query={query} setQuery={setQuery} onSearch={goResult} onHome={goHome} />}
+
+        <TweaksPanel>
+          <TweakSection label="Brand" />
+          <TweakColor label="Accent" value={t.accent}
+            options={["oklch(0.60 0.105 185)", "oklch(0.60 0.11 150)", "oklch(0.58 0.11 250)", "oklch(0.58 0.12 305)"]}
+            onChange={(v) => setTweak("accent", v)} />
+          <TweakToggle label="Dark mode" value={t.dark} onChange={(v) => setTweak("dark", v)} />
+
+          <TweakSection label="Voice & content" />
+          <TweakRadio label="Copy tone" value={t.tone} options={["calm", "blunt"]}
+            onChange={(v) => setTweak("tone", v)} />
+          <TweakRadio label="Score hero" value={t.heroStyle} options={["gauge", "compare"]}
+            onChange={(v) => setTweak("heroStyle", v)} />
+
+          <TweakSection label="Flow" />
+          <TweakButton label={view === "landing" ? "Jump to report →" : "Back to landing ←"}
+            onClick={() => (view === "landing" ? goResult() : goHome())} />
+        </TweaksPanel>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
