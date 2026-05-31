@@ -1,9 +1,15 @@
 import OpenAI from "openai";
 
-const kimi = new OpenAI({
-  apiKey: process.env.KIMI_API_KEY,
-  baseURL: "https://api.moonshot.ai/v1",
-});
+let _kimi;
+function getKimi() {
+  if (!_kimi) {
+    _kimi = new OpenAI({
+      apiKey: process.env.KIMI_API_KEY,
+      baseURL: "https://api.moonshot.ai/v1",
+    });
+  }
+  return _kimi;
+}
 
 const SYSTEM_PROMPT = `You are HotelTruth's review analyst. Your job is to cut through inflated hotel scores and surface the truth for travelers.
 
@@ -72,7 +78,7 @@ export async function analyzeWithKimi(hotelName, reviews, placeData, onStatus) {
 
   if (onStatus) onStatus(`AI analysing ${sample.length} reviews…`);
 
-  const completion = await kimi.chat.completions.create({
+  const completion = await getKimi().chat.completions.create({
     model: "moonshot-v1-128k",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
