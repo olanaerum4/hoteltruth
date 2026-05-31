@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: hoteltruth-api
+    runtime: node
+    rootDir: app
+    buildCommand: npm install
+    startCommand: node server/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: APIFY_TOKEN
+        sync: false
+      - key: KIMI_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
