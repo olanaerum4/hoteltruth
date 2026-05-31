@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     // ── 2. Apify — scrape Google Maps reviews ───────────────────────────
     emit("status", { message: `Searching Google Maps for "${hotel}"…` });
 
-    const run = await apify.actor("apify/google-maps-scraper").call(
+    const run = await apify.actor("compass/crawler-google-places").call(
       {
         searchStringsArray: [hotel],
         maxCrawledPlacesPerSearch: 1,

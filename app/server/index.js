@@ -48,7 +48,7 @@ app.post("/api/analyze", async (req, res) => {
     // ── Step 1: Apify — scrape Google Maps ──────────────────────────────────
     emit("status", { message: `Searching Google Maps for "${hotelName}"…` });
 
-    const run = await apify.actor("apify/google-maps-scraper").call(
+    const run = await apify.actor("compass/crawler-google-places").call(
       {
         searchStringsArray: [hotelName],
         maxCrawledPlacesPerSearch: 1,
