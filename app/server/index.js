@@ -41,24 +41,26 @@ app.post("/api/analyze", async (req, res) => {
     return res.end();
   }
 
-  const hotelName = query.trim();
-  console.log(`[analyze] "${hotelName}"`);
+  const raw = query.trim();
+  const isUrl = raw.includes("google.com/maps") || raw.includes("maps.google.com");
+
+  // Extract display name from Maps URL path, e.g. /maps/place/Scandic+Helsfyr/
+  const nameFromUrl = isUrl
+    ? (() => { const m = raw.match(/\/maps\/place\/([^/@?]+)/); return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : null; })()
+    : null;
+  const hotelName = nameFromUrl ?? raw;
+
+  console.log(`[analyze] "${hotelName}" (${isUrl ? "url" : "search"})`);
 
   try {
     // ── Step 1: Apify — scrape Google Maps ──────────────────────────────────
-    emit("status", { message: `Searching Google Maps for "${hotelName}"…` });
+    emit("status", { message: isUrl ? `Fetching reviews for "${hotelName}"…` : `Searching Google Maps for "${hotelName}"…` });
 
-    const run = await apify.actor("compass/crawler-google-places").call(
-      {
-        searchStringsArray: [hotelName],
-        maxCrawledPlacesPerSearch: 1,
-        language: "en",
-        includeReviews: true,
-        maxReviews: 200,
-        reviewsSort: "newest",
-      },
-      { waitSecs: 300 }
-    );
+    const apifyInput = isUrl
+      ? { startUrls: [{ url: raw }], maxCrawledPlacesPerSearch: 1, language: "en", includeReviews: true, maxReviews: 200, reviewsSort: "newest" }
+      : { searchStringsArray: [hotelName], maxCrawledPlacesPerSearch: 1, language: "en", includeReviews: true, maxReviews: 200, reviewsSort: "newest" };
+
+    const run = await apify.actor("compass/crawler-google-places").call(apifyInput, { waitSecs: 300 });
 
     if (run.status !== "SUCCEEDED") {
       emit("error", { message: `Scraper failed (${run.status}) — try again.` });

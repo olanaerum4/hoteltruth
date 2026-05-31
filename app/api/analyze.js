@@ -38,7 +38,12 @@ export default async function handler(req, res) {
     return res.end();
   }
 
-  const hotel = query.trim();
+  const raw = query.trim();
+  const isUrl = raw.includes("google.com/maps") || raw.includes("maps.google.com");
+  const nameFromUrl = isUrl
+    ? (() => { const m = raw.match(/\/maps\/place\/([^/@?]+)/); return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : null; })()
+    : null;
+  const hotel = nameFromUrl ?? raw;
   const key = cacheKey(hotel);
 
   try {
@@ -61,19 +66,13 @@ export default async function handler(req, res) {
     }
 
     // ── 2. Apify — scrape Google Maps reviews ───────────────────────────
-    emit("status", { message: `Searching Google Maps for "${hotel}"…` });
+    emit("status", { message: isUrl ? `Fetching reviews for "${hotel}"…` : `Searching Google Maps for "${hotel}"…` });
 
-    const run = await apify.actor("compass/crawler-google-places").call(
-      {
-        searchStringsArray: [hotel],
-        maxCrawledPlacesPerSearch: 1,
-        language: "en",
-        includeReviews: true,
-        maxReviews: 200,
-        reviewsSort: "newest",
-      },
-      { waitSecs: 240 }
-    );
+    const apifyInput = isUrl
+      ? { startUrls: [{ url: raw }], maxCrawledPlacesPerSearch: 1, language: "en", includeReviews: true, maxReviews: 200, reviewsSort: "newest" }
+      : { searchStringsArray: [hotel], maxCrawledPlacesPerSearch: 1, language: "en", includeReviews: true, maxReviews: 200, reviewsSort: "newest" };
+
+    const run = await apify.actor("compass/crawler-google-places").call(apifyInput, { waitSecs: 240 });
 
     if (run.status !== "SUCCEEDED") {
       emit("error", { message: `Scraper failed (${run.status}) — try again.` });

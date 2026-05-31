@@ -1,6 +1,6 @@
 import { HTIcon } from "./Icon";
 
-export function HTSearch({ value = "", placeholder = "Search any hotel…", onChange, onSubmit, size = "lg", light }) {
+export function HTSearch({ value = "", placeholder = "Hotel name or paste a Google Maps link…", onChange, onSubmit, size = "lg", light }) {
   const big = size === "lg";
   return (
     <form
