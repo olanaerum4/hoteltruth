@@ -1,28 +1,16 @@
 import { useState, useCallback } from "react";
 import { Landing } from "./pages/Landing";
 import { Result } from "./pages/Result";
-import { TweaksPanel } from "./components/TweaksPanel";
 import { streamAnalyze } from "./api";
 import { HT_HOTEL } from "./data";
 
-const DEFAULTS = {
-  accent: "oklch(0.60 0.105 185)",
-  tone: "calm",
-  heroStyle: "gauge",
-  dark: false,
-};
-
 export default function App() {
-  const [tweaks, setTweaks] = useState(DEFAULTS);
   const [view, setView] = useState("landing");
   const [query, setQuery] = useState(HT_HOTEL);
-
   const [hotelData, setHotelData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
   const [error, setError] = useState(null);
-
-  const setTweak = (key, val) => setTweaks((prev) => ({ ...prev, [key]: val }));
 
   const goHome = useCallback(() => {
     setView("landing");
@@ -59,13 +47,9 @@ export default function App() {
   }, [query]);
 
   return (
-    <div
-      className={"ht-app" + (tweaks.dark ? " ht-dark" : "")}
-      style={{ "--truth": tweaks.accent }}
-    >
+    <div className="ht-app">
       {view === "landing" ? (
         <Landing
-          tone={tweaks.tone}
           query={query}
           setQuery={setQuery}
           onSearch={goResult}
@@ -73,8 +57,6 @@ export default function App() {
         />
       ) : (
         <Result
-          tone={tweaks.tone}
-          heroStyle={tweaks.heroStyle}
           query={query}
           setQuery={setQuery}
           onSearch={goResult}
@@ -85,12 +67,6 @@ export default function App() {
           error={error}
         />
       )}
-      <TweaksPanel
-        tweaks={tweaks}
-        setTweak={setTweak}
-        view={view}
-        onJump={view === "landing" ? goResult : goHome}
-      />
     </div>
   );
 }
