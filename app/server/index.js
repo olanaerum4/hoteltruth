@@ -8,7 +8,13 @@ import { processReviews } from "./processor.js";
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors({ origin: ["http://localhost:3456", "http://localhost:5173"] }));
+const ALLOWED_ORIGINS = [
+  "http://localhost:3456",
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,  // set to your Vercel URL in Railway env vars
+].filter(Boolean);
+
+app.use(cors({ origin: ALLOWED_ORIGINS }));
 app.use(express.json());
 
 const apify = new ApifyClient({ token: process.env.APIFY_TOKEN });
@@ -57,7 +63,7 @@ app.post("/api/analyze", async (req, res) => {
         maxReviews: 200,
         reviewsSort: "newest",
       },
-      { waitForFinish: 300 }
+      { waitSecs: 300 }
     );
 
     if (run.status !== "SUCCEEDED") {

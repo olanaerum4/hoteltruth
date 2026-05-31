@@ -1,7 +1,9 @@
-// Streams Server-Sent Events from POST /api/analyze
-// Yields objects: { type: "status"|"result"|"error", message?, data? }
+// In production (Vercel), set VITE_API_URL to your Railway backend URL.
+// Locally, leave it empty — Vite proxies /api → localhost:3001.
+const BASE = import.meta.env.VITE_API_URL ?? "";
+
 export async function* streamAnalyze(query) {
-  const res = await fetch("/api/analyze", {
+  const res = await fetch(`${BASE}/api/analyze`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query }),

@@ -72,7 +72,7 @@ export default async function handler(req, res) {
         maxReviews: 200,
         reviewsSort: "newest",
       },
-      { waitForFinish: 240 }
+      { waitSecs: 240 }
     );
 
     if (run.status !== "SUCCEEDED") {
