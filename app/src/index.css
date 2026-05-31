@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --bg:          oklch(0.985 0.006 160);
+  --paper:       oklch(0.975 0.009 150);
+  --surface:     #ffffff;
+  --ink:         oklch(0.27 0.022 240);
+  --ink-soft:    oklch(0.46 0.02 240);
+  --muted:       oklch(0.62 0.016 240);
+  --line:        oklch(0.92 0.008 200);
+  --line-strong: oklch(0.85 0.01 200);
+  --line-wash:   oklch(0.95 0.006 200);
+
+  --truth:       oklch(0.60 0.105 185);
+  --truth-deep:  color-mix(in oklch, var(--truth), black 20%);
+  --truth-soft:  color-mix(in oklch, var(--truth), white 34%);
+
+  --good:        oklch(0.62 0.11 162);
+  --alert:       oklch(0.605 0.16 28);
+  --alert-wash:  oklch(0.95 0.035 28);
+  --amber:       oklch(0.78 0.135 72);
+  --amber-wash:  oklch(0.95 0.05 80);
+
+  --invert-bg:   oklch(0.27 0.022 240);
+  --invert-fg:   #ffffff;
+}
+
+.ht-dark {
+  --bg:          oklch(0.205 0.018 245);
+  --paper:       oklch(0.225 0.02 245);
+  --surface:     oklch(0.255 0.02 245);
+  --ink:         oklch(0.955 0.008 240);
+  --ink-soft:    oklch(0.80 0.014 240);
+  --muted:       oklch(0.64 0.016 240);
+  --line:        oklch(0.36 0.018 245);
+  --line-strong: oklch(0.46 0.02 245);
+  --line-wash:   oklch(0.30 0.018 245);
+  --truth-deep:  color-mix(in oklch, var(--truth), white 14%);
+  --alert-wash:  oklch(0.33 0.06 28);
+  --amber-wash:  oklch(0.35 0.07 80);
+  --invert-bg:   oklch(0.31 0.025 245);
+  --invert-fg:   oklch(0.97 0.008 240);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); }
+#root { min-height: 100vh; }
+
+.ht-app {
+  font-family: var(--sans);
+  color: var(--ink);
+  min-height: 100vh;
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background 0.25s;
+}
+.ht-app h1, .ht-app h2, .ht-app p { margin: 0; }
+
+.ht-eyebrow {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--truth-deep);
+}
+
+.ht-h2 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  color: var(--ink);
+}
+
+.ht-navlink { cursor: pointer; }
+.ht-navlink:hover { color: var(--ink); }
+
+.ht-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--truth-deep);
+  background: color-mix(in oklch, var(--truth) 16%, transparent);
+  padding: 4px 11px 4px 8px;
+  border-radius: 99px;
+  letter-spacing: -0.1px;
+}
+
+.ht-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-family: var(--sans);
+  font-weight: 700;
+  border-radius: 99px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  white-space: nowrap;
+  padding: 10px 18px;
+  transition: transform 0.12s, background 0.15s, box-shadow 0.15s;
+  line-height: 1;
+  text-decoration: none;
+  font-size: 14px;
+}
+.ht-btn-primary { background: var(--truth); color: #fff; }
+.ht-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -7px color-mix(in oklch, var(--truth), black 10%);
+}
+.ht-btn-ghost {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+.ht-btn-ghost:hover { background: var(--surface); }
+
+.ht-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 6px 13px;
+  border-radius: 99px;
+  transition: border-color 0.12s, color 0.12s;
+  cursor: pointer;
+  user-select: none;
+}
+.ht-chip:hover { border-color: var(--line-strong); color: var(--ink); }
+.ht-chip-on { background: var(--ink); color: var(--bg) !important; border-color: var(--ink); }
+
+.ht-complaint {
+  transition: border-color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+}
+.ht-complaint:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 4px 14px -8px rgba(20, 30, 45, 0.2);
+}
+
+.ht-search input::placeholder { color: var(--muted); opacity: 1; }
+.ht-search { transition: border-color 0.15s, box-shadow 0.15s; }
+.ht-search:focus-within {
+  border-color: var(--truth) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--truth) 18%, transparent) !important;
+}

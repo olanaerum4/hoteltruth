@@ -1,0 +1,11 @@
+# Design prototype files stay local — only ship the app
+project/
+chats/
+
+# Dependencies & build output
+app/node_modules/
+app/dist/
+
+# Secrets
+app/.env
+app/.env.local
