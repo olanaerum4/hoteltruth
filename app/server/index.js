@@ -118,7 +118,7 @@ app.post("/api/analyze", async (req, res) => {
 });
 
 // SPA fallback — serve index.html for any non-API route
-app.get("*", (_req, res) => {
+app.use((_req, res) => {
   res.sendFile(join(DIST, "index.html"));
 });
 
