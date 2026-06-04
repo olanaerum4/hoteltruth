@@ -4,12 +4,18 @@ import cors from "cors";
 import { ApifyClient } from "apify-client";
 import { analyzeWithKimi } from "./ai.js";
 import { processReviews } from "./processor.js";
+import { fileURLToPath } from "url";
+import { join, dirname } from "path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const DIST = join(__dirname, "../dist");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({ origin: true }));
 app.use(express.json());
+app.use(express.static(DIST));
 
 const apify = new ApifyClient({ token: process.env.APIFY_TOKEN });
 
@@ -109,6 +115,11 @@ app.post("/api/analyze", async (req, res) => {
     emit("error", { message: err.message });
     res.end();
   }
+});
+
+// SPA fallback — serve index.html for any non-API route
+app.get("*", (_req, res) => {
+  res.sendFile(join(DIST, "index.html"));
 });
 
 app.listen(PORT, () => {
