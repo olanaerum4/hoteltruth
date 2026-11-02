@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GeoPulse: Higher or Lower</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef4fb;--bg2:#dbe8f8;--card:#fff;--text:#0f172a;--mut:#64748b;--ac:#0284c7;--ac2:#6366f1;--ok:#059669;--bad:#e11d48;--warn:#d97706;--line:#e2e8f0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1020;--bg2:#17204a;--card:#161d36;--text:#f1f5f9;--mut:#94a3b8;--ac:#38bdf8;--ac2:#818cf8;--ok:#34d399;--bad:#fb7185;--warn:#fbbf24;--line:#27304f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b1020;--bg2:#17204a;--card:#161d36;--text:#f1f5f9;--mut:#94a3b8;--ac:#38bdf8;--ac2:#818cf8;--ok:#34d399;--bad:#fb7185;--warn:#fbbf24;--line:#27304f;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+html{height:100%}
+body{min-height:100%;font-family:Outfit,system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 20% 0,var(--bg2),var(--bg) 60%);background-color:var(--bg);display:flex;flex-direction:column;align-items:center;padding:12px 16px;overflow-x:hidden}
+#app{width:100%;max-width:880px;display:flex;flex-direction:column;gap:10px}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.logo{font-weight:900;font-size:22px;background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent;cursor:pointer;white-space:nowrap}
+.stats{display:flex;gap:8px;align-items:center}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px 12px;text-align:center}
+.chip small{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:700}
+.chip b{font-size:18px;font-weight:900}
+.icon{background:var(--card);border:1px solid var(--line);color:var(--text);width:40px;height:40px;padding:0;border-radius:12px;font-size:18px;display:grid;place-items:center}
+.lvl{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;color:var(--mut)}
+.bar{flex:1;height:8px;border-radius:9px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .4s}
+#timer i{background:var(--ok)}
+#timer.warn i{background:var(--warn)}
+#timer.crit i{background:var(--bad)}
+#cat{align-self:center;background:linear-gradient(90deg,var(--ac),var(--ac2));color:#fff;padding:6px 18px;border-radius:99px;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+#q{text-align:center;font-size:clamp(18px,4vw,26px);font-weight:800;line-height:1.2;min-height:2.4em;display:flex;align-items:center;justify-content:center}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;position:relative}
+.vs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--text);color:var(--bg);font-weight:900;font-size:12px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;z-index:2;border:3px solid var(--bg)}
+.card{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:18px 10px;text-align:center;transition:.25s;min-height:220px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;min-width:0}
+.card.click{cursor:pointer}.card.click:hover{transform:translateY(-4px);border-color:var(--ac)}
+.card.win{border-color:var(--ok);box-shadow:0 0 0 4px color-mix(in srgb,var(--ok) 25%,transparent)}
+.card.lose{border-color:var(--bad);box-shadow:0 0 0 4px color-mix(in srgb,var(--bad) 25%,transparent)}
+.flag{font-size:clamp(52px,12vw,84px);line-height:1.1}
+.flagimg{height:clamp(56px,13vw,92px);max-width:90%;object-fit:contain;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.nm{font-weight:900;font-size:clamp(17px,3.6vw,26px);overflow-wrap:anywhere}
+.sub{font-size:12px;font-weight:600;color:var(--mut)}
+.val{font-weight:900;font-size:clamp(22px,5vw,34px);color:var(--ac);font-variant-numeric:tabular-nums}
+.val.q{color:var(--mut)}
+#btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#fq{display:none;flex-direction:column;gap:12px;align-items:center}
+#fq .big{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:22px;width:100%;display:grid;place-items:center;min-height:200px}
+#fq .big .flagimg{height:clamp(110px,26vw,170px)}
+#fq .big .flag{font-size:clamp(100px,24vw,150px)}
+#opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+#opts button{background:var(--card);color:var(--text);border:2px solid var(--line);font-size:15px;overflow-wrap:anywhere}
+#opts button:hover{border-color:var(--ac)}
+#opts button.win{background:var(--ok);border-color:var(--ok);color:#fff}
+#opts button.lose{background:var(--bad);border-color:var(--bad);color:#fff}
+button{font:inherit;cursor:pointer;border:0;border-radius:16px;padding:14px;font-weight:900;font-size:16px;color:#fff;transition:.15s}
+button:active{transform:scale(.96)}
+button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.hi{background:var(--ok)}.lo{background:var(--bad)}
+.pri{background:linear-gradient(90deg,var(--ac),var(--ac2));width:100%}
+.pri small{font-weight:600;opacity:.85}
+.sec{background:var(--card);color:var(--text);border:1px solid var(--line);width:100%}
+#info{text-align:center;font-size:13px;font-weight:600;color:var(--mut);min-height:3.2em;line-height:1.5}
+#info b{color:var(--text)}
+#ov{position:fixed;inset:0;background:rgba(8,12,28,.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9;overflow-y:auto}
+#ov[hidden]{display:none}
+.box{background:var(--card);color:var(--text);border-radius:28px;padding:26px;max-width:420px;width:100%;text-align:center;display:flex;flex-direction:column;gap:12px;margin:auto}
+.box h3{font-size:30px;font-weight:900}.box p{color:var(--mut);font-size:14px}
+.lvls{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;font-size:11px;font-weight:700;color:var(--mut)}
+.lvls span{background:var(--bg);padding:4px 10px;border-radius:99px}
+.src{font-size:11px;font-weight:700;color:var(--mut);display:flex;align-items:center;justify-content:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mut)}
+.dot.live{background:var(--ok)}.dot.load{background:var(--warn);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+#toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translate(-50%,-90px);background:var(--text);color:var(--bg);padding:10px 20px;border-radius:99px;font-weight:800;transition:.4s;z-index:20;white-space:nowrap}
+#toast.on{transform:translate(-50%,0)}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media(max-width:560px){.card{min-height:180px;padding:14px 6px}.chip{padding:4px 9px}.chip b{font-size:16px}.logo{font-size:19px}#opts button{font-size:14px;padding:12px 8px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+<header><div class="logo" onclick="menu()" title="Menu">🌍 GeoPulse</div>
+<div class="stats"><div class="chip"><small>Streak</small><b id="sc">0</b></div><div class="chip"><small>Best</small><b id="bs">0</b></div><button class="icon" id="th" onclick="cycleTheme()" title="Theme" aria-label="Toggle theme">🌓</button></div></header>
+<div class="lvl"><span id="lv">LVL 1</span><div class="bar"><i id="lb"></i></div><span id="ln">Rookie</span></div>
+<div id="cat"></div>
+<h2 id="q"></h2>
+<div class="bar" id="timer"><i></i></div>
+<main class="grid" id="grid"><div class="card" id="cA"></div><div class="vs">VS</div><div class="card" id="cB"></div></main>
+<section id="fq"><div class="big" id="fqf"></div><div id="opts"></div></section>
+<div id="btns"><button class="hi" onclick="ans('h')">⬆ HIGHER</button><button class="lo" onclick="ans('l')">⬇ LOWER</button></div>
+<p id="info" aria-live="polite"></p>
+</div>
+<div id="ov"></div>
+<div id="toast" role="status"></div>
+<script>
+/* ---------- REST Countries config ---------- */
+const RC={
+ base:"https://restcountries.com/v3.1/all",
+ fields:"name,cca2,population,area,borders,timezones,flags,capital,independent,region",
+ key:"rc_live_4ee426c6d91f420a8a834c3e7c96b2a4",
+ cacheKey:"gp_rc_v1",ttl:864e5
+};
+
+/* ---------- Built-in fallback data (used offline / if the API fails) ---------- */
+const N={};"US:United States,CN:China,IN:India,ID:Indonesia,PK:Pakistan,BR:Brazil,NG:Nigeria,BD:Bangladesh,RU:Russia,MX:Mexico,JP:Japan,ET:Ethiopia,PH:Philippines,EG:Egypt,VN:Vietnam,TR:Türkiye,IR:Iran,DE:Germany,TH:Thailand,GB:United Kingdom,FR:France,IT:Italy,ZA:South Africa,KR:South Korea,ES:Spain,AR:Argentina,CA:Canada,PL:Poland,UA:Ukraine,SA:Saudi Arabia,AU:Australia,NL:Netherlands,CH:Switzerland,SE:Sweden,NO:Norway,DK:Denmark,FI:Finland,IS:Iceland,NZ:New Zealand,IE:Ireland,PT:Portugal,GR:Greece,SG:Singapore,AE:UAE,QA:Qatar,KE:Kenya,CL:Chile,PE:Peru,CO:Colombia,NP:Nepal".split(",").forEach(p=>{const[k,v]=p.split(":");N[k]=v});
+const CORE=new Set(Object.keys(N));
+const INFO={};// cc -> {cap, reg, img}
+const P=s=>{const o={};s.split(",").forEach(p=>{const[k,v]=p.split(":");o[k]=+v});return o};
+const fl=c=>String.fromCodePoint(...[...c].map(x=>127397+x.charCodeAt()));
+const n=v=>v>=100?Math.round(v).toLocaleString("en-US"):(+v.toFixed(v<1?2:1)).toString();
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pop=P("CN:1409,IN:1451,US:340,ID:283,PK:251,BR:212,NG:233,BD:174,RU:144,MX:130,JP:124,ET:130,PH:115,EG:114,VN:101,TR:87,IR:91,DE:84,TH:72,GB:69,FR:68,IT:59,ZA:64,KR:52,ES:48,AR:46,CA:41,PL:37,UA:38,SA:34,AU:27,NL:18,CH:9,SE:10.6,NO:5.5,DK:6,FI:5.6,IS:0.39,NZ:5.3,IE:5.3,PT:10.4,GR:10.4,SG:6,AE:10,QA:3,KE:56,CL:19.7,PE:34,CO:52,NP:30");
+const area=P("RU:17098,CA:9985,US:9834,CN:9597,BR:8516,AU:7692,IN:3287,AR:2780,SA:2150,MX:1964,ID:1905,EG:1002,NG:924,PK:882,TR:784,ZA:1221,IR:1648,ET:1104,CO:1142,PE:1285,CL:756,KE:580,UA:604,FR:551,ES:506,TH:513,SE:450,JP:378,DE:358,VN:331,NO:385,PL:313,IT:301,NZ:268,GB:243,PH:300,BD:148,IS:103,GR:132,PT:92,IE:70,DK:43,CH:41,NL:42,NP:147,QA:11.6,SG:0.73,AE:84,FI:338,KR:100");
+const dens={},bord={},tz={};
+const calcDens=()=>{for(const k in dens)delete dens[k];for(const k in pop)if(area[k]>0&&pop[k]>0)dens[k]=pop[k]*1000/area[k]};calcDens();
+
+const CATS=[
+{l:1,n:"👥 Population",lb:"population",d:pop,f:v=>n(v)+" M",t:"China and India together hold roughly 35% of everyone on Earth."},
+{l:1,n:"🗺️ Land Area",lb:"total area",d:area,f:v=>n(v*1000)+" km²",t:"Russia spans 11 time zones."},
+{l:2,n:"❤️ Life Expectancy",lb:"life expectancy",d:P("JP:84.8,CH:84,KR:83.7,ES:83.5,AU:83.3,IT:83.5,SE:83,NO:83.2,IS:83,FR:83,SG:83.5,NL:82,CA:82.6,NZ:82,DE:81,GB:81,IE:82.5,DK:82,FI:82,PT:82,GR:81.5,US:78.5,CN:78,CL:80,AE:79,QA:81,SA:78,TR:77.5,TH:77,BR:75.5,MX:75,AR:77,CO:77,PE:77,VN:74.5,IR:77,PL:77,UA:73,RU:73,ID:71,PH:69,EG:71,IN:70.5,BD:74,PK:67,KE:62,ZA:65,NG:54,ET:67,NP:70"),f:v=>v.toFixed(1)+" yrs",t:"Around 30 years separate the top and the bottom of this list."},
+{l:2,n:"🎂 Median Age",lb:"median age",d:P("JP:49,IT:48,DE:45,GR:45,PT:46,ES:45,FI:43,FR:42,GB:40,CA:41,KR:45,CH:43,US:38,CN:39,RU:40,PL:42,NO:40,SE:41,NL:42,AU:38,BR:34,TR:33,TH:40,IR:33,MX:30,VN:33,ID:30,BD:28,IN:28,EG:25,PH:25,PK:21,ET:20,KE:20,NG:18,ZA:28,AR:33,DK:42,NZ:38,IE:38,SG:42,UA:41"),f:v=>v+" yrs",t:"Half of Nigeria's population is younger than about 18."},
+{l:2,n:"🧭 Neighbours",lb:"number of land borders",d:bord,cnt:1,api:1,f:v=>v+(v===1?" country":" countries"),t:"China and Russia each border 14 countries, the most of any nation."},
+{l:3,n:"💰 GDP per Capita",lb:"GDP per capita",d:P("US:82,CN:12.6,IN:2.5,ID:4.9,PK:1.4,BR:10.4,NG:0.8,BD:2.5,RU:13.9,MX:13.8,JP:33.8,ET:1.0,PH:3.9,EG:3.5,VN:4.3,TR:13.1,IR:4.0,DE:52,TH:7.2,GB:49,FR:44,IT:38,ZA:6.3,KR:33,ES:33,AR:13.7,CA:53,PL:22,UA:5.2,SA:32,AU:65,NL:63,CH:100,SE:56,NO:87,DK:68,FI:54,IS:80,NZ:48,IE:105,PT:28,GR:22,SG:88,AE:50,QA:81,KE:2.1,CL:17,PE:7.2,CO:6.9,NP:1.4"),f:v=>"$"+Math.round(v*1000).toLocaleString("en-US"),t:"GDP per capita ignores inequality and cost of living, so treat it as a rough guide."},
+{l:3,n:"🌊 Coastline",lb:"coastline length",d:P("CA:202080,NO:58133,ID:54716,RU:37653,PH:36289,JP:29751,AU:25760,US:19924,NZ:15134,CN:14500,GR:13676,GB:12429,MX:9330,IT:7600,BR:7491,DK:7314,TR:7200,IN:7000,CL:6435,FI:1250,SE:3218,ES:4964,FR:4853,IE:1448,DE:2389,PT:1793,TH:3219,VN:3444,EG:2450,SA:2640,KR:2413,AR:4989,ZA:2798,PE:2414,CO:3208,NG:853,KE:536,PK:1046,BD:580,IR:2440,IS:4970,NL:451,PL:440,UA:2782,AE:1318,QA:563,SG:193"),f:v=>n(v)+" km",t:"Canada's coastline is long enough to circle the Earth about five times."},
+{l:4,n:"🏙️ Population Density",lb:"population density",d:dens,f:v=>n(v)+" /km²",t:"Monaco and Singapore pack thousands of people into every square kilometre."},
+{l:4,n:"🕰️ Time Zones",lb:"number of time zones",d:tz,cnt:1,api:1,f:v=>v+(v===1?" zone":" zones"),t:"Thanks to its overseas territories, France covers 12 time zones, more than any other country."},
+{l:4,n:"🏭 CO₂ per Person",lb:"CO₂ emissions per person",d:P("QA:35,AE:20,SA:18,AU:15,US:14.3,CA:14,KR:11.6,RU:11.4,JP:8.5,DE:7.9,CN:8.4,IR:8.5,PL:7.8,NL:7.5,FI:7,GB:4.7,FR:4.4,IT:5.2,ES:5,SE:3.4,NO:7.5,DK:4.7,CH:4,TR:5.2,ZA:6.8,TH:3.7,MX:3.5,VN:3.9,ID:2.3,BR:2.2,IN:2,PH:1.3,EG:2.3,PK:1,BD:0.6,KE:0.4,NG:0.6,ET:0.15,NP:0.5,SG:7.7,NZ:6.5,GR:5,PT:3.8,IE:6.5"),f:v=>n(v)+" t/yr",t:"A person in Qatar emits more than 50× the CO₂ of one in Ethiopia."}];
+const LV=[0,4,2.6,1.7,1.3,1.15,1.07],TM=[0,18,16,14,12,10,8],LN=["","Rookie","Explorer","Navigator","Cartographer","Geo Master","Legend"];
+const MODES={hl:"⬆⬇ Higher or Lower",tt:"⚔️ This or That",fq:"🚩 Flag Quiz"};
+const S={mode:"hl",score:0,lv:1,lock:true,tm:null,end:0,dur:0,paused:null,cat:null,a:null,b:null,dir:"hi",opts:[],ans:null,src:"load",onMenu:true,toastT:null};
+const $=id=>document.getElementById(id);
+const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+const best=m=>+store.get("gp2_"+m)||0;
+const setBest=(m,v)=>store.set("gp2_"+m,v);
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const nm=c=>N[c]||c;
+
+/* ---------- Live data from REST Countries ---------- */
+function applyData(list){
+ let cnt=0;
+ for(const c of list){
+  const cc=c.cca2;const p=c.population,a=c.area;
+  if(!cc||!c.independent||!(p>0)||!(a>0))continue;
+  cnt++;
+  N[cc]=c.name&&c.name.common||N[cc]||cc;
+  INFO[cc]={cap:(c.capital||[])[0]||"",reg:c.region||"",img:c.flags&&(c.flags.svg||c.flags.png)||""};
+  pop[cc]=p/1e6;area[cc]=a/1000;
+  bord[cc]=(c.borders||[]).length;tz[cc]=(c.timezones||[]).length||1;
+ }
+ if(cnt<50)throw new Error("too few countries");
+ N.TR="Türkiye";calcDens();return cnt;
+}
+async function fetchRC(){
+ const url=`${RC.base}?fields=${RC.fields}`;
+ const tries=[()=>fetch(url,{headers:{Authorization:"Bearer "+RC.key,"X-API-Key":RC.key}}),()=>fetch(url+"&apikey="+encodeURIComponent(RC.key)),()=>fetch(url)];
+ let err;
+ for(const t of tries){try{const r=await t();if(r.ok){const j=await r.json();if(Array.isArray(j)&&j.length)return j}err=new Error("HTTP "+r.status)}catch(e){err=e}}
+ throw err;
+}
+async function loadData(){
+ try{const c=JSON.parse(store.get(RC.cacheKey)||"null");if(c&&Date.now()-c.t<RC.ttl){S.cnt=applyData(c.d);S.src="live";refreshMenu();return}}catch(e){}
+ try{
+  const d=await fetchRC();S.cnt=applyData(d);S.src="live";
+  store.set(RC.cacheKey,JSON.stringify({t:Date.now(),d}));
+ }catch(e){console.warn("REST Countries unavailable, using built-in data",e);S.src="off"}
+ refreshMenu();
+}
+const apiOK=()=>S.src==="live";
+function srcLabel(){return S.src==="live"?`<span class="dot live"></span>Live data · ${S.cnt} countries via REST Countries`:S.src==="load"?`<span class="dot load"></span>Loading live country data…`:`<span class="dot"></span>Offline mode · ${CORE.size} built-in countries`}
+
+/* ---------- Helpers ---------- */
+function toast(t){const e=$("toast");e.textContent=t;e.className="on";clearTimeout(S.toastT);S.toastT=setTimeout(()=>e.className="",1800)}
+function flagErr(img){const d=document.createElement("div");d.className="flag";d.textContent=fl(img.dataset.cc);img.replaceWith(d)}
+function flagHTML(c){const src=INFO[c]&&INFO[c].img||`https://flagcdn.com/${c.toLowerCase()}.svg`;return`<img class="flagimg" src="${esc(src)}" data-cc="${c}" alt="Flag" onerror="flagErr(this)">`}
+const wide=()=>S.lv>=3&&apiOK();
+function pool(cat){const k=Object.keys(cat.d);const p=wide()?k:k.filter(x=>CORE.has(x));return p.length>=8?p:k}
+const ratio=(cat,x,y)=>cat.cnt?(Math.max(x,y)+1)/(Math.min(x,y)+1):Math.max(x,y)/Math.min(x,y);
+function pick(cat,a){
+ const lo=LV[S.lv],tg=lo*(1+Math.random()*.8),va=cat.d[a];
+ const c=pool(cat).filter(k=>k!==a&&cat.d[k]!==va).map(k=>({k,r:ratio(cat,va,cat.d[k])})).filter(x=>x.r>=1.02);
+ if(!c.length)return Object.keys(cat.d).find(k=>k!==a&&cat.d[k]!==va);
+ c.sort((x,y)=>Math.abs(Math.log(x.r/tg))-Math.abs(Math.log(y.r/tg)));return rnd(c.slice(0,3)).k}
+function card(c,v){const i=INFO[c];return`${flagHTML(c)}<div class="nm">${esc(nm(c))}</div>${i&&i.cap?`<div class="sub">🏛️ ${esc(i.cap)}</div>`:""}<div class="val ${v?"":"q"}">${v||"?"}</div>`}
+function hud(){
+ $("lv").textContent="LVL "+S.lv;$("ln").textContent=LN[S.lv];
+ $("lb").style.width=(S.lv>=6?100:(S.score%5)*20)+"%";$("sc").textContent=S.score;$("bs").textContent=best(S.mode);
+}
+function layout(m){$("grid").style.display=m==="fq"?"none":"grid";$("fq").style.display=m==="fq"?"flex":"none";$("btns").style.display=m==="hl"?"grid":"none"}
+
+/* ---------- Rounds ---------- */
+function round(){
+ S.lv=Math.min(6,Math.floor(S.score/5)+1);S.onMenu=false;
+ layout(S.mode);$("info").innerHTML="";hud();
+ if(S.mode==="fq")return flagRound();
+ const av=CATS.filter(c=>c.l<=S.lv&&(!c.api||apiOK())&&Object.keys(c.d).length>8);
+ let cat=rnd(av);if(cat===S.cat&&Math.random()<.6)cat=rnd(av);
+ const keep=S.mode==="hl"&&S.b&&cat.d[S.b]!==undefined&&(wide()||CORE.has(S.b));
+ S.cat=cat;S.a=keep?S.b:rnd(pool(cat));S.b=pick(cat,S.a);
+ S.dir=S.mode==="tt"&&S.lv>=3&&Math.random()<.4?"lo":"hi";
+ const hl=S.mode==="hl",A=$("cA"),B=$("cB");
+ $("cat").textContent=cat.n;
+ $("q").innerHTML="<span>"+(hl?`Is <u>${esc(nm(S.b))}</u>'s ${cat.lb} higher or lower than <u>${esc(nm(S.a))}</u>'s?`:`Which has the <u>${S.dir==="hi"?"HIGHER":"LOWER"}</u> ${cat.lb}?`)+"</span>";
+ A.className="card"+(hl?"":" click");B.className="card"+(hl?"":" click");
+ A.innerHTML=card(S.a,hl?cat.f(cat.d[S.a]):"");B.innerHTML=card(S.b,"");
+ A.onclick=hl?null:()=>ans("a");B.onclick=hl?null:()=>ans("b");
+ S.lock=false;clock(TM[S.lv]);
+}
+function flagRound(){
+ const all=Object.keys(pop).filter(c=>N[c]);
+ const base=wide()?all:all.filter(c=>CORE.has(c));
+ const t=rnd(base);const reg=INFO[t]&&INFO[t].reg;
+ let cand=all.filter(c=>c!==t);
+ if(S.lv>=3&&reg){const same=cand.filter(c=>INFO[c]&&INFO[c].reg===reg);if(same.length>=3)cand=same}
+ else if(!wide())cand=cand.filter(c=>CORE.has(c));
+ S.a=t;S.opts=shuffle([t,...shuffle(cand).slice(0,3)]);
+ $("cat").textContent="🚩 Flag Quiz";$("q").textContent="Which country does this flag belong to?";
+ $("fqf").innerHTML=flagHTML(t);
+ $("opts").innerHTML=S.opts.map((c,i)=>`<button onclick="ans(${i})"><small style="opacity:.5">${i+1}</small> ${esc(nm(c))}</button>`).join("");
+ S.lock=false;clock(Math.max(6,TM[S.lv]-4));
+}
+
+/* ---------- Timer (pauses when the tab is hidden) ---------- */
+function clock(s){S.dur=s*1000;S.paused=null;run(S.dur)}
+function run(rem){
+ const t=$("timer"),i=t.firstElementChild;clearTimeout(S.tm);clearInterval(S.tick);
+ i.style.transition="none";i.style.width=(rem/S.dur*100)+"%";i.offsetWidth;
+ i.style.transition=`width ${rem}ms linear`;i.style.width="0%";
+ S.end=Date.now()+rem;S.tm=setTimeout(()=>ans(null),rem);
+ const upd=()=>{const f=(S.end-Date.now())/S.dur;t.className="bar"+(f<.2?" crit":f<.45?" warn":"")};upd();S.tick=setInterval(upd,250);
+}
+function stopClock(){clearTimeout(S.tm);clearInterval(S.tick)}
+document.addEventListener("visibilitychange",()=>{
+ if(S.lock)return;
+ if(document.hidden){S.paused=Math.max(0,S.end-Date.now());stopClock();const i=$("timer").firstElementChild;i.style.transition="none";i.style.width=(S.paused/S.dur*100)+"%"}
+ else if(S.paused!=null){const r=S.paused;S.paused=null;run(r)}
+});
+
+/* ---------- Answering ---------- */
+function ans(g){
+ if(S.lock)return;S.lock=true;stopClock();
+ if(S.mode==="fq")return ansFlag(g);
+ const cat=S.cat,va=cat.d[S.a],vb=cat.d[S.b];let ok=false;
+ const hiK=vb>va?"b":"a",win=S.dir==="hi"?hiK:(hiK==="a"?"b":"a");
+ if(S.mode==="hl")ok=g!==null&&(g==="h")===(vb>va);else ok=g===win;
+ $("cA").innerHTML=card(S.a,cat.f(va));$("cB").innerHTML=card(S.b,cat.f(vb));
+ $("cA").classList.remove("click");$("cB").classList.remove("click");
+ if(S.mode==="tt"){$("c"+win.toUpperCase()).classList.add("win");$("c"+(win==="a"?"B":"A")).classList.add("lose")}
+ else $("cB").classList.add(ok?"win":"lose");
+ const hi=vb>va?S.b:S.a,lw=vb>va?S.a:S.b,mx=Math.max(va,vb),mn=Math.min(va,vb);
+ const cmp=cat.cnt||mn===0?`<b>${mx-mn}</b> more than ${esc(nm(lw))}`:(()=>{const r=mx/mn;return`<b>${r.toFixed(r<2?2:1)}×</b> the ${cat.lb} of ${esc(nm(lw))}`})();
+ $("info").innerHTML=`${g===null?"⏰ Time's up! ":""}<b>${esc(nm(hi))}</b> has ${cmp}.<br>💡 ${cat.t}`;
+ finish(ok,g===null);
+}
+function ansFlag(g){
+ const ti=S.opts.indexOf(S.a),ok=g===ti,bs=$("opts").children;
+ bs[ti].classList.add("win");if(g!==null&&!ok&&bs[g])bs[g].classList.add("lose");
+ const i=INFO[S.a]||{};
+ $("info").innerHTML=`${g===null?"⏰ Time's up! ":ok?"✅ ":"❌ "}That's the flag of <b>${esc(nm(S.a))}</b>.${i.cap?`<br>🏛️ Capital: <b>${esc(i.cap)}</b>${i.reg?` · 🌐 ${esc(i.reg)}`:""}`:""}`;
+ finish(ok,g===null);
+}
+function finish(ok,timeout){
+ if(ok){S.score++;if(S.score>best(S.mode))setBest(S.mode,S.score);hud();
+  const nl=Math.min(6,Math.floor(S.score/5)+1);if(nl>S.lv)setTimeout(()=>toast("⚡ Level "+nl+": "+LN[nl]+"!"),500);
+  setTimeout(()=>{if(!S.onMenu)round()},S.mode==="fq"?1500:2300)}
+ else{$("app").classList.remove("shake");void $("app").offsetWidth;$("app").classList.add("shake");try{navigator.vibrate&&navigator.vibrate(120)}catch(e){}
+  setTimeout(()=>{if(!S.onMenu)over()},timeout?1300:1800)}
+}
+
+/* ---------- Screens ---------- */
+function over(){
+ const nb=S.score>0&&S.score>=best(S.mode);
+ $("ov").hidden=false;$("ov").innerHTML=`<div class="box"><div style="font-size:48px">${nb?"🏆":"💥"}</div><h3>${nb?"New Record!":"Game Over"}</h3><p>${MODES[S.mode]} · You reached <b>Level ${S.lv} · ${LN[S.lv]}</b></p>
+<div style="display:flex;justify-content:space-around"><div class="chip"><small>Streak</small><b>${S.score}</b></div><div class="chip"><small>Best</small><b>${best(S.mode)}</b></div></div>
+<button class="pri" id="again" onclick="start(S.mode)">Play again 🔄</button><button class="sec" onclick="share()">📤 Share score</button><button class="sec" onclick="menu()">Menu</button>
+<p style="font-size:12px">Press Enter to play again</p></div>`;$("again").focus()}
+function share(){const t=`🌍 GeoPulse (${MODES[S.mode]}): I hit a streak of ${S.score} and reached Level ${S.lv} (${LN[S.lv]})! Can you beat me?`;
+ if(navigator.share){navigator.share({text:t,url:location.href}).catch(()=>{});return}
+ (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Copied! 🚀")).catch(()=>toast("Copy not available here"))}
+function start(m){S.mode=m;S.score=0;S.lv=1;S.b=null;S.cat=null;$("ov").hidden=true;round()}
+function menu(){S.lock=true;S.onMenu=true;stopClock();$("ov").hidden=false;$("ov").innerHTML=`<div class="box"><div style="font-size:48px">🌍</div><h3>GeoPulse</h3><p>Compare countries on population, wealth, borders, climate and more. It gets harder every 5 correct answers, and from level 3 the whole world joins in.</p>
+<button class="pri" onclick="start('hl')">${MODES.hl}<br><small>Best: ${best("hl")}</small></button>
+<button class="pri" onclick="start('tt')">${MODES.tt}<br><small>Best: ${best("tt")}</small></button>
+<button class="pri" onclick="start('fq')">${MODES.fq}<br><small>Best: ${best("fq")}</small></button>
+<div class="lvls">${LN.slice(1).map((x,i)=>`<span>${i+1} ${x}</span>`).join("")}</div>
+<p style="font-size:12px">Keys: ↑ ↓ Higher/Lower · ← → This or That · 1–4 Flag Quiz · Esc menu</p>
+<div class="src" id="src">${srcLabel()}</div></div>`}
+function refreshMenu(){const e=$("src");if(e)e.innerHTML=srcLabel()}
+
+/* ---------- Theme ---------- */
+const THEMES=["auto","light","dark"],TI={auto:"🌓",light:"☀️",dark:"🌙"};
+function applyTheme(t){if(t==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.dataset.theme=t;$("th").textContent=TI[t]}
+function cycleTheme(){const c=store.get("gp_theme")||"auto",nx=THEMES[(THEMES.indexOf(c)+1)%3];store.set("gp_theme",nx);applyTheme(nx);toast("Theme: "+nx)}
+
+/* ---------- Input ---------- */
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){if(!S.onMenu)menu();return}
+ if(e.key==="Enter"&&!$("ov").hidden&&!S.onMenu){e.preventDefault();start(S.mode);return}
+ if(S.mode==="fq"){const d=+e.key;if(d>=1&&d<=4){ans(d-1)}return}
+ const m={ArrowUp:"h",ArrowDown:"l",ArrowLeft:"a",ArrowRight:"b"}[e.key];
+ if(m&&((S.mode==="hl"&&"hl".includes(m))||(S.mode==="tt"&&"ab".includes(m)))){e.preventDefault();ans(m)}
+});
+
+applyTheme(store.get("gp_theme")||"auto");
+menu();loadData();
+</script>
+</body>
+</html>
