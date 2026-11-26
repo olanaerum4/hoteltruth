@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>døgn.no – Norge på ett døgn</title>
+<meta name="description" content="Se Norge i sanntid: barn født, bompenger betalt, strøm brukt og mer – siden midnatt i dag. Beregnede snitt basert på offentlig statistikk.">
+<meta property="og:title" content="Norge på ett døgn – døgn.no">
+<meta property="og:description" content="Hva har skjedd i Norge siden midnatt? Levende tall basert på offentlig statistikk.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://døgn.no/">
+<meta name="theme-color" content="#0a0f1e">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23ff5a4e' stroke-width='4'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23ff5a4e'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0f1e;
+    --sky:#1b2a55;
+    --card:rgba(255,255,255,.045);
+    --card-b:rgba(255,255,255,.09);
+    --ink:#f4f1ea;
+    --muted:#a3a9bb;
+    --faint:#6b7287;
+    --red:#ff5a4e;
+    --gold:#ffc861;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);
+    background-image:radial-gradient(120% 60% at 50% -10%, var(--sky) 0%, transparent 70%);
+    background-attachment:fixed;
+    color:var(--ink);
+    font-family:"Inter Tight",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-variant-numeric:tabular-nums;
+    -webkit-font-smoothing:antialiased;
+    transition:background-color 2s;
+    min-height:100vh;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+  a{color:inherit}
+
+  /* Topbar */
+  header.top{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+  .logo{font-weight:800;font-size:22px;letter-spacing:-.02em;text-decoration:none}
+  .logo span{color:var(--red)}
+  .controls{display:flex;gap:8px}
+  button.btn{
+    font:inherit;font-size:14px;font-weight:600;color:var(--ink);
+    background:rgba(255,255,255,.07);border:1px solid var(--card-b);
+    padding:9px 14px;border-radius:999px;cursor:pointer;
+  }
+  button.btn:hover{background:rgba(255,255,255,.13)}
+  button.btn.primary{background:var(--red);border-color:var(--red);color:#fff}
+  button.btn.primary:hover{filter:brightness(1.08)}
+
+  /* Hero */
+  .hero{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;padding:24px 0 28px}
+  .live{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+  .live i{width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 0 0 rgba(255,90,78,.6);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,90,78,.55)}70%{box-shadow:0 0 0 10px rgba(255,90,78,0)}100%{box-shadow:0 0 0 0 rgba(255,90,78,0)}}
+  h1{font-size:clamp(40px,7vw,84px);line-height:.95;letter-spacing:-.04em;margin:14px 0 18px;font-weight:800}
+  .lede{font-size:clamp(18px,2.2vw,24px);line-height:1.4;color:var(--muted);max-width:640px;margin:0}
+  .lede b{color:var(--ink);font-weight:700}
+  .lede b.r{color:var(--gold)}
+
+  .clock{position:relative;width:220px;height:220px}
+  .clock svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .clock .c-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .clock .time{font-size:40px;font-weight:700;letter-spacing:-.02em}
+  .clock .pct{font-size:13px;color:var(--muted);margin-top:2px}
+
+  /* Disclaimer */
+  .note{
+    display:flex;gap:12px;align-items:flex-start;
+    border:1px solid rgba(255,200,97,.35);background:rgba(255,200,97,.07);
+    border-radius:14px;padding:14px 16px;font-size:14.5px;line-height:1.5;color:#e9dfc8;margin-bottom:28px;
+  }
+  .note strong{color:var(--gold)}
+  .note a{color:var(--gold)}
+
+  /* Grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .card{
+    position:relative;background:var(--card);border:1px solid var(--card-b);border-radius:18px;
+    padding:20px 20px 16px;display:flex;flex-direction:column;min-height:196px;
+  }
+  .card .lbl{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:var(--muted)}
+  .card .ico{font-size:22px;line-height:1}
+  .card .num{font-size:clamp(32px,3.6vw,42px);font-weight:800;letter-spacing:-.03em;margin:14px 0 4px;line-height:1.05;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px}
+  .card .num .v{white-space:nowrap}
+  .card .num small{font-size:.45em;font-weight:600;color:var(--muted);letter-spacing:0;white-space:nowrap}
+  .card .rate{font-size:14px;color:var(--muted);line-height:1.45}
+  .card .rate em{font-style:normal;color:var(--ink)}
+  .card .foot{margin-top:auto;padding-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:var(--faint)}
+  .card .share{font:inherit;font-size:12px;font-weight:600;color:var(--muted);background:none;border:1px solid var(--card-b);border-radius:999px;padding:5px 10px;cursor:pointer}
+  .card .share:hover{color:var(--ink);border-color:var(--muted)}
+  .bar{height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:12px;overflow:hidden}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--gold));width:0}
+
+  /* Method */
+  section.method{margin:56px 0 30px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:40px}
+  section.method h2{font-size:28px;letter-spacing:-.02em;margin:0 0 12px}
+  section.method p{color:var(--muted);line-height:1.6;margin:0 0 12px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--card-b);vertical-align:top}
+  th{color:var(--faint);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+  td.n{white-space:nowrap}
+  td .src{color:var(--muted)}
+  footer{padding:30px 0 50px;color:var(--faint);font-size:13px;border-top:1px solid var(--card-b)}
+
+  /* Toast */
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:#fff;color:#111;font-weight:600;font-size:14px;padding:10px 16px;border-radius:999px;transition:.25s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* Screenshot mode */
+  .watermark{display:none}
+  body.shot header.top .controls .btn:not(#shotBtn),
+  body.shot .note, body.shot section.method, body.shot footer, body.shot .card .share{display:none}
+  body.shot .watermark{display:flex;justify-content:space-between;align-items:center;margin:24px 0 40px;font-size:15px;color:var(--muted)}
+  body.shot .watermark b{color:var(--ink);font-size:20px}
+
+  @media (max-width:760px){
+    .hero{grid-template-columns:1fr;gap:20px}
+    .clock{width:170px;height:170px;order:-1}
+    .clock .time{font-size:27px}
+    .clock .pct{font-size:11px}
+    section.method{grid-template-columns:minmax(0,1fr);gap:16px}
+    td.n{white-space:normal}
+    .controls .btn span{display:none}
+  }
+  @media (max-width:380px){ .grid{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion:reduce){ .live i{animation:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="/">døgn<span>.</span>no</a>
+    <div class="controls">
+      <button class="btn" id="shotBtn" title="Skjul alt unntatt tallene">📸 <span>Skjermbildemodus</span></button>
+      <button class="btn primary" id="shareAll">Del</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="live"><i></i> Norge akkurat nå</div>
+      <h1>Norge på<br>ett døgn</h1>
+      <p class="lede" id="lede">Laster tallene …</p>
+    </div>
+    <div class="clock" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="5"/>
+        <circle id="ring" cx="50" cy="50" r="44" fill="none" stroke="url(#g)" stroke-width="5" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="276.46"/>
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a4e"/><stop offset="1" stop-color="#ffc861"/></linearGradient></defs>
+      </svg>
+      <div class="c-in">
+        <div class="time" id="clock">--:--:--</div>
+        <div class="pct" id="pct">av døgnet har gått</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="note" role="note">
+    <span>ℹ️</span>
+    <div><strong>Dette er beregnede snitt, ikke målinger i sanntid.</strong>
+      Tallene er regnet ut fra årstall fra SSB, Statens vegvesen og andre kilder, delt på antall dager i året og fordelt utover døgnet etter et typisk døgnmønster. De viser hvordan et gjennomsnittsdøgn ser ut – ikke hva som faktisk skjer i dag. <a href="#metode">Les om metoden</a>.</div>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <div class="watermark"><span>Beregnede snitt fra offentlig statistikk – ikke sanntidsmålinger</span><b>døgn.no</b></div>
+
+  <section class="method" id="metode">
+    <div>
+      <h2>Slik regner vi</h2>
+      <p>Vi tar et offisielt årstall, for eksempel antall fødte i Norge i fjor, og deler det på antall dager i året. Det gir et snittdøgn.</p>
+      <p>Snittdøgnet fordeles så time for time etter et typisk mønster: bompenger følger rushtrafikken, fly følger rutetidene, og kaffen drikkes mest om morgenen. Telleren starter på null ved midnatt norsk tid.</p>
+      <p>Tallene tar ikke hensyn til ukedag, sesong, helligdager eller hva som faktisk skjer i dag. De er ment for å gi en følelse av størrelser – ikke som fasit.</p>
+    </div>
+    <div>
+      <table>
+        <thead><tr><th>Tall</th><th>Per år</th><th>Kilde</th></tr></thead>
+        <tbody id="sources"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    døgn.no – Norge på ett døgn. Laget av Tallenes Norge. Tallene er beregnede gjennomsnitt basert på offentlig statistikk og kan avvike fra virkeligheten.
+  </footer>
+</div>
+
+<div class="toast" id="toast">Kopiert!</div>
+
+<script>
+/* =========================================================
+   DATA
+   annual  = årstall fra kilden
+   profile = navn på døgnmønster (se PROFILES)
+   kind    = 'count' (heltall), 'money' (kr), 'energy' (kWh)
+   PROTOTYPE: Verifiser alle årstall mot kildene før lansering.
+   ========================================================= */
+const STATS = [
+  { id:'fodte',    ico:'👶', label:'Barn født',               annual:54000,        kind:'count',  unit:'barn',       profile:'births',   src:'SSB – Fødte', year:2024,
+    inv:n=>`har det blitt født ${n} barn i Norge`, plain:n=>`det har blitt født ${n} barn` },
+  { id:'vekst',    ico:'📈', label:'Flere innbyggere',        annual:44000,        kind:'count',  unit:'personer',   profile:'flat',     src:'SSB – Befolkningsendringer (folketilvekst)', year:2024,
+    inv:n=>`har Norge fått ${n} flere innbyggere`, plain:n=>`Norge har fått ${n} flere innbyggere` },
+  { id:'bom',      ico:'🚗', label:'Bompenger betalt',        annual:13000000000,  kind:'money',  unit:'kr',         profile:'traffic',  src:'Statens vegvesen – Bompengestatistikk', year:2023,
+    inv:n=>`har nordmenn betalt ${n} i bompenger`, plain:n=>`nordmenn har betalt ${n} i bompenger` },
+  { id:'strom',    ico:'⚡', label:'Strøm brukt',             annual:138e9,        kind:'energy', unit:'kWh',        profile:'power',    src:'SSB – Elektrisitet (nettoforbruk)', year:2024,
+    inv:n=>`har vi brukt ${n} strøm`, plain:n=>`vi har brukt ${n} strøm` },
+  { id:'kaffe',    ico:'☕', label:'Kopper kaffe drukket',    annual:7.1e9,        kind:'count',  unit:'kopper',     profile:'coffee',   src:'Norsk kaffeinformasjon (anslag ut fra kg per innbygger)', year:2023,
+    inv:n=>`har vi drukket ${n} kopper kaffe`, plain:n=>`vi har drukket ${n} kopper kaffe` },
+  { id:'sjomat',   ico:'🐟', label:'Måltider med norsk sjømat i verden', annual:40e6*365, kind:'count', unit:'måltider', profile:'meals', src:'Norges sjømatråd (40 mill. måltider per dag)', year:2024,
+    inv:n=>`er det spist ${n} måltider med norsk sjømat rundt om i verden`, plain:n=>`verden har spist ${n} måltider med norsk sjømat` },
+  { id:'eksport',  ico:'🚢', label:'Sjømateksport',           annual:175e9,        kind:'money',  unit:'kr',         profile:'flat',     src:'Norges sjømatråd – Eksportverdi', year:2024,
+    inv:n=>`har Norge eksportert sjømat for ${n}`, plain:n=>`Norge har eksportert sjømat for ${n}` },
+  { id:'fly',      ico:'✈️', label:'Flypassasjerer',          annual:54e6,         kind:'count',  unit:'reisende',   profile:'flights',  src:'Avinor – Passasjerstatistikk', year:2024,
+    inv:n=>`har ${n} reist via norske lufthavner`, plain:n=>`${n} har reist via norske lufthavner` },
+  { id:'kollektiv',ico:'🚆', label:'Kollektivreiser',         annual:600e6,        kind:'count',  unit:'reiser',     profile:'traffic',  src:'SSB – Kollektivtransport', year:2023,
+    inv:n=>`er det tatt ${n} kollektivreiser`, plain:n=>`det er tatt ${n} kollektivreiser` },
+  { id:'elbil',    ico:'🔌', label:'Nye elbiler registrert',  annual:114400,       kind:'count',  unit:'elbiler',    profile:'business', src:'OFV – Bilsalget', year:2024,
+    inv:n=>`er det registrert ${n} nye elbiler`, plain:n=>`det er registrert ${n} nye elbiler` },
+  { id:'bolig',    ico:'🏗️', label:'Nye boliger påbegynt',    annual:19000,        kind:'count',  unit:'boliger',    profile:'business', src:'SSB – Byggeareal (igangsatte boliger)', year:2024,
+    inv:n=>`er det startet bygging av ${n} nye boliger`, plain:n=>`byggingen av ${n} nye boliger har startet` },
+  { id:'gift',     ico:'💍', label:'Par som har giftet seg',  annual:18000,        kind:'count',  unit:'par',        profile:'weddings', src:'SSB – Ekteskap og skilsmisser', year:2024,
+    inv:n=>`har ${n} par giftet seg`, plain:n=>`${n} par har giftet seg` },
+];
+
+/* Døgnmønstre: 24 vekter, én per time (00–23). Normaliseres automatisk. */
+const PROFILES = {
+  flat:     Array(24).fill(1),
+  births:   [.85,.8,.8,.8,.8,.85,.9,1,1.15,1.25,1.25,1.2,1.15,1.15,1.1,1.1,1.05,1,1,.95,.95,.9,.9,.85],
+  traffic:  [.15,.08,.06,.06,.12,.4,1.1,2,1.9,1.3,1.15,1.2,1.25,1.35,1.6,2,2.1,1.7,1.25,.95,.75,.6,.45,.28],
+  power:    [.85,.82,.8,.8,.82,.88,.98,1.1,1.15,1.12,1.08,1.05,1.03,1.02,1.02,1.04,1.08,1.12,1.12,1.08,1.03,.98,.93,.88],
+  flights:  [.05,.01,.01,.01,.05,.4,1.5,1.9,1.7,1.4,1.3,1.3,1.3,1.3,1.4,1.6,1.8,1.7,1.5,1.3,1.1,.9,.6,.2],
+  coffee:   [.05,.02,.02,.02,.05,.4,1.8,2.6,2.4,1.9,1.6,1.4,1.5,1.5,1.3,1.1,.9,.8,.9,.8,.6,.4,.2,.1],
+  meals:    [.6,.5,.5,.6,.8,1,1.1,1.1,1,1,1.2,1.4,1.5,1.3,1.1,1,1.1,1.3,1.4,1.3,1.1,.9,.8,.7],
+  business: [.02,.02,.02,.02,.02,.05,.3,1,2,2.2,2.2,2,2,2,1.9,1.4,.6,.3,.2,.1,.05,.03,.02,.02],
+  weddings: [0,0,0,0,0,0,0,0,.1,.4,1.2,2.6,3.4,3.6,3.4,2.8,1.8,.9,.4,.2,.1,0,0,0],
+};
+// normaliser så hver profil summerer til 24 og lag kumulativ tabell
+const CUM = {};
+for (const [k,w] of Object.entries(PROFILES)){
+  const s = w.reduce((a,b)=>a+b,0);
+  const n = w.map(x=>x*24/s);
+  const c=[0]; n.forEach((x,i)=>c.push(c[i]+x));
+  PROFILES[k]=n; CUM[k]=c;
+}
+
+/* ---------- Norsk tid ---------- */
+const tzFmt = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Oslo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'});
+function osloNow(){
+  const d = new Date();
+  const p = Object.fromEntries(tzFmt.formatToParts(d).map(x=>[x.type,x.value]));
+  const y=+p.year, h=+p.hour, m=+p.minute, s=+p.second;
+  const secs = h*3600 + m*60 + s + d.getMilliseconds()/1000;
+  const leap = (y%4===0 && y%100!==0) || y%400===0;
+  return { y, h, m, s, secs, days: leap?366:365 };
+}
+
+/* andel av et snittdøgn som har "skjedd" ved tidspunkt t (sekunder siden midnatt) */
+function fraction(profile, secs){
+  const hr = Math.min(secs/3600, 23.99999);
+  const i = Math.floor(hr);
+  return (CUM[profile][i] + (hr-i)*PROFILES[profile][i]) / 24;
+}
+function rateNow(stat, t){ // enheter per sekund akkurat nå
+  const perDay = stat.annual / t.days;
+  return perDay * PROFILES[stat.profile][t.h] / 86400;
+}
+
+/* ---------- Formattering ---------- */
+const nf0 = new Intl.NumberFormat('nb-NO',{maximumFractionDigits:0});
+const nf1 = new Intl.NumberFormat('nb-NO',{maximumFractionDigits:1});
+function fmtValue(stat, v){
+  if (stat.kind==='money') return nf0.format(Math.floor(v));
+  return nf0.format(Math.floor(v));
+}
+function prettyBig(v, unit){ // til setninger og deling
+  const f = Math.floor(v);
+  if (unit==='kr'){
+    if (f>=1e9) return nf1.format(f/1e9)+' milliarder kroner';
+    if (f>=1e6) return nf1.format(f/1e6)+' millioner kroner';
+    return nf0.format(f)+' kroner';
+  }
+  if (unit==='kWh'){
+    if (f>=1e9) return nf1.format(f/1e9)+' TWh';
+    if (f>=1e6) return nf1.format(f/1e6)+' GWh';
+    return nf0.format(f)+' kWh';
+  }
+  if (f>=1e9) return nf1.format(f/1e9)+' milliarder';
+  if (f>=1e6) return nf1.format(f/1e6)+' millioner';
+  return nf0.format(f);
+}
+function intervalText(sec){
+  if (sec < 90) return `${nf0.format(Math.round(sec))} sek`;
+  if (sec < 5400) return `${nf0.format(Math.round(sec/60))} min`;
+  return `${nf1.format(sec/3600)} timer`;
+}
+function rateText(stat, t){
+  const r = rateNow(stat, t);
+  if (r <= 0) return 'Akkurat nå: <em>stille</em> – skjer nesten aldri på denne tiden';
+  if (stat.kind==='money') return `Akkurat nå: <em>${nf0.format(Math.round(r))} kr</em> i sekundet`;
+  if (stat.kind==='energy') return `Akkurat nå: <em>${nf0.format(Math.round(r))} kWh</em> i sekundet`;
+  if (r >= 1) return `Akkurat nå: <em>${nf0.format(Math.round(r))} ${stat.unit}</em> i sekundet`;
+  return `Akkurat nå: ca. <em>én hvert ${intervalText(1/r)}</em>`;
+}
+
+/* ---------- Bygg kort ---------- */
+const grid = document.getElementById('grid');
+const els = {};
+for (const s of STATS){
+  const c = document.createElement('article');
+  c.className='card';
+  c.innerHTML = `
+    <div class="lbl"><span class="ico">${s.ico}</span>${s.label}</div>
+    <div class="num"><span class="v">0</span><small>${s.unit}</small></div>
+    <div class="rate"></div>
+    <div class="bar"><i></i></div>
+    <div class="foot"><span>Snittdøgn: ${prettyBig(s.annual/365, s.unit)} · ${s.src.split(' – ')[0]}</span><button class="share" type="button">Del</button></div>`;
+  c.querySelector('.share').addEventListener('click',()=>share(cardText(s)));
+  grid.appendChild(c);
+  els[s.id] = { v:c.querySelector('.v'), rate:c.querySelector('.rate'), bar:c.querySelector('.bar i') };
+}
+document.getElementById('sources').innerHTML = STATS.map(s=>
+  `<tr><td>${s.label}</td><td class="n">${prettyBig(s.annual, s.unit)}${s.unit!=='kr'&&s.unit!=='kWh'?' '+s.unit:''}</td><td class="src">${s.src}, ${s.year}</td></tr>`).join('');
+
+/* ---------- Live-oppdatering ---------- */
+const ring = document.getElementById('ring'), RING = 276.46;
+const clockEl = document.getElementById('clock'), pctEl = document.getElementById('pct');
+const ledeEl = document.getElementById('lede');
+let lastSlow = -1;
+
+function value(s, t){ return (s.annual / t.days) * fraction(s.profile, t.secs); }
+
+function tick(){
+  const t = osloNow();
+  for (const s of STATS){
+    const v = value(s,t);
+    const e = els[s.id];
+    const txt = fmtValue(s, v);
+    if (e.v.textContent !== txt) e.v.textContent = txt;
+  }
+  const sec = Math.floor(t.secs);
+  if (sec !== lastSlow){ lastSlow = sec; slow(t); }
+  requestAnimationFrame(tick);
+}
+
+function slow(t){
+  const pad = n=>String(n).padStart(2,'0');
+  clockEl.textContent = `${pad(t.h)}:${pad(t.m)}:${pad(t.s)}`;
+  const frac = t.secs/86400;
+  ring.style.strokeDashoffset = RING*(1-frac);
+  pctEl.textContent = `${nf0.format(Math.floor(frac*100))} % av døgnet har gått`;
+  for (const s of STATS){
+    els[s.id].rate.innerHTML = rateText(s,t);
+    els[s.id].bar.style.width = (fraction(s.profile,t.secs)*100).toFixed(2)+'%';
+  }
+  if (t.s % 6 === 0 || !ledeEl.dataset.ok) updateLede(t);
+  setSky(t.secs/3600);
+}
+
+/* Roterende setning – laget for skjermbilder */
+const PAIRS = [['fodte','bom'],['kaffe','strom'],['fly','elbil'],['sjomat','eksport'],['gift','vekst'],['kollektiv','bolig']];
+let pairIdx = 0;
+function num(s,t){ const v=value(s,t); return s.kind==='count'?prettyBig(v):prettyBig(v,s.unit); }
+function byId(id){ return STATS.find(x=>x.id===id); }
+function updateLede(t){
+  const [a,b] = PAIRS[pairIdx];
+  const A=byId(a), B=byId(b);
+  ledeEl.innerHTML = `Siden midnatt i dag ${A.inv(`<b class="r">${num(A,t)}</b>`)}, og ${B.plain(`<b>${num(B,t)}</b>`)}.`;
+  ledeEl.dataset.ok = 1;
+  pairIdx = (pairIdx+1) % PAIRS.length;
+}
+
+/* Himmelfarge etter tid på døgnet */
+const SKY = [[0,'#121a3a'],[5,'#2a1f4a'],[7,'#6a3a4a'],[9,'#1f3d6e'],[14,'#1d4a7d'],[18,'#5a2f48'],[21,'#1c1f45'],[24,'#121a3a']];
+function hex(h){return [1,3,5].map(i=>parseInt(h.slice(i,i+2),16))}
+function setSky(hr){
+  let i=0; while(SKY[i+1][0] < hr) i++;
+  const [h0,c0]=SKY[i],[h1,c1]=SKY[i+1], k=(hr-h0)/(h1-h0);
+  const a=hex(c0),b=hex(c1);
+  const c=a.map((x,j)=>Math.round(x+(b[j]-x)*k));
+  document.documentElement.style.setProperty('--sky',`rgb(${c.join(',')})`);
+}
+
+/* ---------- Deling ---------- */
+const URL_ = 'https://døgn.no';
+function cardText(s){
+  const sent = s.inv(num(s,osloNow()));
+  return `Siden midnatt i dag ${sent} 🇳🇴 (beregnet snitt) – se Norge i sanntid på ${URL_}`;
+}
+function allText(){
+  const t=osloNow();
+  const lines = ['fodte','bom','kaffe','strom','fly'].map(id=>{
+    const s=byId(id); const p=s.plain(num(s,t));
+    return '• '+p.charAt(0).toUpperCase()+p.slice(1);
+  });
+  return `Norge på ett døgn – siden midnatt i dag:\n${lines.join('\n')}\n(Beregnede snitt fra offentlig statistikk)\nSe Norge i sanntid: ${URL_}`;
+}
+async function share(text){
+  try{
+    if (navigator.share){ await navigator.share({title:'døgn.no',text}); return; }
+  }catch(e){ if (e && e.name==='AbortError') return; }
+  try{ await navigator.clipboard.writeText(text); toast('Kopiert – lim inn hvor du vil!'); }
+  catch(e){ prompt('Kopier teksten:', text); }
+}
+function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200); }
+document.getElementById('shareAll').addEventListener('click',()=>share(allText()));
+document.getElementById('shotBtn').addEventListener('click',()=>{
+  document.body.classList.toggle('shot');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
